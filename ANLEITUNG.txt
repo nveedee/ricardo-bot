@@ -1,0 +1,80 @@
+===========================================================
+  RICARDO DEAL ALERT BOT  -  So startest du in 4 Schritten
+===========================================================
+
+Alles Noetige ist schon vorbereitet. Du musst nur Folgendes tun:
+
+
+SCHRITT 1  -  Telegram-Bot erstellen (BotFather)
+------------------------------------------------
+- In Telegram "@BotFather" suchen und oeffnen.
+- Schreib ihm:  /newbot
+- Gib einen Namen und einen Benutzernamen (endet auf "bot") ein.
+- BotFather antwortet mit einem TOKEN (lange Zeichenkette mit : drin).
+  Diesen Token kopieren.
+
+
+SCHRITT 2  -  Token eintragen
+-----------------------------
+- Datei ".env" in diesem Ordner mit einem Editor oeffnen
+  (Rechtsklick -> Oeffnen mit -> Editor).
+- Hinter  TELEGRAM_BOT_TOKEN=  den Token einfuegen. Beispiel:
+     TELEGRAM_BOT_TOKEN=123456789:AAb...xyz
+- Speichern und schliessen.
+
+
+SCHRITT 3  -  Verbindung einrichten
+-----------------------------------
+- Oeffne in Telegram deinen eigenen Bot (den Namen von Schritt 1)
+  und schreib ihm irgendwas, z.B. "hallo".
+- Dann doppelklick auf:   2-setup.bat
+  Das findet automatisch deine Chat-ID, traegt sie ein und
+  schickt dir eine Test-Nachricht in Telegram.
+
+
+SCHRITT 4  -  Bot starten
+-------------------------
+- Doppelklick auf:   3-start.bat
+- Fenster offen lassen. Der Bot prueft jetzt alle 5 Minuten und
+  meldet neue Treffer per Telegram.
+- Beenden: Fenster schliessen oder Strg+C.
+
+
+-----------------------------------------------------------
+WAS DU SUCHST, EINSTELLEN
+-----------------------------------------------------------
+Datei "config.json" oeffnen. In "brands" steht deine Marken-Liste:
+jede Marke mit dem hoechsten Sofortkauf-Preis, bei dem du noch eine
+Meldung willst (= "so guenstig waere ein Schnaeppchen").
+
+  "brands": {
+    "arcteryx": 70,          <- Meldung nur wenn Arcteryx <= 70 CHF
+    "stone island": 50,
+    "comme des garcons": 80,
+    ...
+  }
+
+=> NEUE MARKE HINZUFUEGEN: eine Zeile ergaenzen, z.B.
+     "nike": 35,
+   (bei allen ausser der letzten Zeile ein Komma am Ende!)
+
+=> MARKE ENTFERNEN: Zeile loeschen.
+=> PREIS AENDERN: Zahl anpassen.
+
+Der Bot laedt alle neuen Herrenmode-Inserate (Groesse M/38/1 Size,
+nur Sofortkauf) und meldet nur die, deren Marke in der Liste steht
+UND deren Preis <= dem Marken-Limit ist.
+
+Nach Aenderung Bot neu starten (bzw. auf Railway neu hochladen).
+
+
+-----------------------------------------------------------
+GUT ZU WISSEN
+-----------------------------------------------------------
+- Der ALLERERSTE Lauf schickt absichtlich noch nichts. Er merkt
+  sich nur, was gerade schon da ist, damit du nicht mit alten
+  Inseraten zugespammt wirst. Erst NEUE Inserate loesen Meldungen aus.
+
+- Nur zum Ausprobieren (ohne lange zu warten): test-einmal.bat
+
+- Falls Pakete fehlen sollten: einmal 1-installieren.bat ausfuehren.

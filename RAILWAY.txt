@@ -1,0 +1,59 @@
+===========================================================
+  BOT 24/7 IN DER CLOUD LAUFEN LASSEN  (Railway)
+===========================================================
+
+Damit laeuft der Bot rund um die Uhr - auch wenn dein Laptop aus ist.
+Kosten: kleines Gratis-Startguthaben, danach ca. 5 $/Monat.
+
+Alle Befehle im Ordner "deal-alert-bot" ausfuehren.
+In Claude Code kannst du sie mit vorangestelltem "!" tippen, z.B.:
+   ! npx -y @railway/cli login
+
+
+SCHRITT 1  -  Bei Railway anmelden (oeffnet den Browser)
+--------------------------------------------------------
+   npx -y @railway/cli login
+   -> im Browser mit E-Mail/GitHub anmelden, Fenster bestaetigen.
+
+
+SCHRITT 2  -  Projekt anlegen
+-----------------------------
+   npx -y @railway/cli init
+   -> einen Namen eingeben, z.B.  ricardo-bot
+
+
+SCHRITT 3  -  Hochladen & starten
+---------------------------------
+   npx -y @railway/cli up
+   -> lädt den Ordner hoch, baut und startet den Bot in der Cloud.
+
+
+SCHRITT 4  -  Geheime Zugangsdaten setzen
+-----------------------------------------
+Auf  https://railway.app  einloggen -> dein Projekt -> Tab "Variables"
+-> "New Variable" und diese drei anlegen (Werte aus deiner .env-Datei):
+
+   TELEGRAM_BOT_TOKEN   = (dein Token von BotFather)
+   TELEGRAM_CHAT_ID     = (deine Chat-ID, steht in .env)
+   POLL_MINUTES         = 5
+
+Nach dem Speichern startet Railway den Bot automatisch neu - fertig.
+
+
+FERTIG
+------
+Der Bot laeuft jetzt 24/7 in der Cloud und schickt dir Telegram-Meldungen,
+egal ob dein Laptop an ist oder nicht.
+
+Logs ansehen:   npx -y @railway/cli logs
+Stoppen/loeschen: im Railway-Dashboard unter Settings.
+
+
+HINWEISE
+--------
+- Die Datei .env und seen.json werden NICHT hochgeladen (Secrets bleiben
+  bei dir; die Zugangsdaten setzt du in Schritt 4 im Dashboard).
+- Bei jedem neuen Hochladen (Redeploy) setzt der Bot die Baseline neu
+  (kurz keine Alerts, dann wieder normal). Das ist gewollt und harmlos.
+- WICHTIG: Sobald der Cloud-Bot laeuft, sollte der lokale Bot (3-start.bat
+  bzw. der Hintergrund-Lauf) AUS sein - sonst bekommst du doppelte Meldungen.

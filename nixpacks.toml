@@ -1,0 +1,9 @@
+# Build-Konfiguration fuer Railway (Nixpacks).
+# Stellt sicher, dass `curl` im Container vorhanden ist (wird gebraucht, um
+# Ricardo an Cloudflare vorbei zu laden) und startet den Bot als Dauer-Worker.
+
+[phases.setup]
+aptPkgs = ["curl"]
+
+[start]
+cmd = "node index.js"
