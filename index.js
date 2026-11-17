@@ -16,6 +16,11 @@ const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = process.env;
 const POLL_MINUTES = Number(process.env.POLL_MINUTES) || 5;
 const RUN_ONCE = process.argv.includes("--once");
 
+// Which curl to use. On a datacenter host (Railway) Cloudflare blocks plain
+// curl's TLS fingerprint, so we use a browser-impersonating curl there via env.
+const CURL_BIN = process.env.CURL_BIN || "curl";
+const CURL_IMPERSONATE = process.env.CURL_IMPERSONATE || ""; // e.g. "chrome110"
+
 const BASE = "https://www.ricardo.ch";
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
@@ -140,22 +145,28 @@ function priceBefore(html, labelIdx) {
 // Ricardo is behind Cloudflare (blocks Node's TLS fingerprint -> 403), so the
 // page is fetched via the system `curl` binary, then parsed with cheerio.
 async function fetchHtml(url) {
-  const args = [
-    "-sS", "--compressed", "--max-time", "30", "--fail-with-body",
-    "-A", UA,
-    "-H", "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "-H", "Accept-Language: de-CH,de;q=0.9,en;q=0.8",
-    url,
-  ];
+  const args = ["-sS", "--compressed", "--max-time", "30", "--fail-with-body"];
+  if (CURL_IMPERSONATE) {
+    // Browser-impersonating curl sets a matching TLS fingerprint + headers.
+    args.push("--impersonate", CURL_IMPERSONATE);
+    args.push("-H", "Accept-Language: de-CH,de;q=0.9,en;q=0.8");
+  } else {
+    args.push(
+      "-A", UA,
+      "-H", "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "-H", "Accept-Language: de-CH,de;q=0.9,en;q=0.8"
+    );
+  }
+  args.push(url);
   try {
-    const { stdout } = await execFileAsync("curl", args, {
+    const { stdout } = await execFileAsync(CURL_BIN, args, {
       maxBuffer: 48 * 1024 * 1024,
       windowsHide: true,
     });
     return stdout;
   } catch (err) {
     if (err.code === "ENOENT")
-      throw new Error("`curl` nicht gefunden (wird zum Laden von Ricardo gebraucht).");
+      throw new Error(`\`${CURL_BIN}\` nicht gefunden (wird zum Laden von Ricardo gebraucht).`);
     const status = (err.message.match(/returned error: (\d+)/) || [])[1];
     throw new Error(status ? `HTTP ${status}` : err.message.trim());
   }
