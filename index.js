@@ -17,9 +17,10 @@ const POLL_MINUTES = Number(process.env.POLL_MINUTES) || 5;
 const RUN_ONCE = process.argv.includes("--once");
 
 // Which curl to use. On a datacenter host (Railway) Cloudflare blocks plain
-// curl's TLS fingerprint, so we use a browser-impersonating curl there via env.
+// curl's TLS fingerprint, so CURL_BIN points at a browser-impersonating curl
+// wrapper there (e.g. curl_chrome110), which sets its own TLS + headers.
 const CURL_BIN = process.env.CURL_BIN || "curl";
-const CURL_IMPERSONATE = process.env.CURL_IMPERSONATE || ""; // e.g. "chrome110"
+const BROWSER_CURL = CURL_BIN !== "curl";
 
 const BASE = "https://www.ricardo.ch";
 const UA =
@@ -146,17 +147,15 @@ function priceBefore(html, labelIdx) {
 // page is fetched via the system `curl` binary, then parsed with cheerio.
 async function fetchHtml(url) {
   const args = ["-sS", "--compressed", "--max-time", "30", "--fail-with-body"];
-  if (CURL_IMPERSONATE) {
-    // Browser-impersonating curl sets a matching TLS fingerprint + headers.
-    args.push("--impersonate", CURL_IMPERSONATE);
-    args.push("-H", "Accept-Language: de-CH,de;q=0.9,en;q=0.8");
-  } else {
+  if (!BROWSER_CURL) {
+    // Plain curl: supply our own browser-ish headers.
     args.push(
       "-A", UA,
       "-H", "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       "-H", "Accept-Language: de-CH,de;q=0.9,en;q=0.8"
     );
   }
+  // else: the browser-curl wrapper already sets a matching TLS + headers.
   args.push(url);
   try {
     const { stdout } = await execFileAsync(CURL_BIN, args, {

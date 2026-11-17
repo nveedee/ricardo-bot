@@ -14,11 +14,11 @@ RUN apt-get update \
     && rm /tmp/ci.tar.gz \
     && rm -rf /var/lib/apt/lists/*
 
-# Make the browser-curl available and tell the bot to use it.
+# Make the browser-curl available and tell the bot to use the Chrome wrapper
+# (the wrapper script sets the full Chrome TLS fingerprint + headers itself).
 ENV PATH="/opt/curl-impersonate:${PATH}"
 ENV LD_LIBRARY_PATH="/opt/curl-impersonate"
-ENV CURL_BIN="curl-impersonate-chrome"
-ENV CURL_IMPERSONATE="chrome110"
+ENV CURL_BIN="curl_chrome110"
 
 WORKDIR /app
 
