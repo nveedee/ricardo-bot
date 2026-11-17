@@ -1,0 +1,7 @@
+node_modules
+.env
+seen.json
+.git
+*.bat
+ANLEITUNG.txt
+RAILWAY.txt
